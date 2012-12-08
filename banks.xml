@@ -10,7 +10,161 @@ broadcast chan boatSail;
 broadcast chan thiefOnA;
 broadcast chan thiefOffA;
 broadcast chan thiefOnB;
-broadcast chan thiefOffB;</declaration><template><name x="5" y="5">Thief</name><parameter>boat_t &amp;boat</parameter><declaration>// Place local declarations here.
+broadcast chan thiefOffB;
+
+int[0,6] persons;
+
+const int BOY = 1;
+const int GIRL = 2;
+const int DAD = 3;
+const int MOM = 4;
+const int THIEF = 5;
+const int POLICE = 6;
+const int EMPTY = 0;
+
+
+const int personCount = 8;
+const int personCountBoat = 2;
+
+
+int bankA[personCount] = {BOY,BOY,DAD,GIRL,GIRL,MOM,THIEF,POLICE};
+int bankB[personCount] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY};
+int boatGroup[personCount] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY};
+
+
+bool contains(int group[personCount], int personType)
+{
+
+	int i;
+	
+	for(i = 0 ; i &lt; personCount ; i++)
+	{
+		if(group[i] == personType)
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool momProblem(int group[personCount])
+{
+
+
+	int i = 0;
+	bool containsMom = false;
+	bool containsBoy = false;
+	
+	for(i = 0 ; i &lt; personCount ; i++)
+	{
+		if(group[i] == MOM)
+		{
+			containsMom = true;
+		}
+
+		if(group[i] == BOY)
+		{
+			containsBoy = true;
+		}
+	}
+
+	if(containsBoy&amp;&amp; containsMom){
+
+		return true;
+	} else {
+		return false;
+	}
+
+
+
+}
+
+
+bool dadProblem(int group[personCount])
+{
+
+
+	int i = 0;
+	bool containsDad = false;
+	bool containsBoy = false;
+	
+	for(i = 0 ; i &lt; personCount ; i++)
+	{
+		if(group[i] == DAD)
+		{
+			containsDad = true;
+		}
+
+		if(group[i] == GIRL)
+		{
+			containsBoy = true;
+		}
+	}
+
+	if(containsBoy&amp;&amp; containsDad){
+
+		return true;
+	} else {
+		return false;
+	}
+
+
+
+}
+
+
+bool thiefProblem(int group[personCount]) {
+	int i = 0;
+	int groupSize = 0;
+	for(i = 0 ; i &lt; personCount ; i++)
+	{
+		if(group[i] == EMPTY)
+		{
+		groupSize++;	
+		}
+
+		
+	}
+
+	if((personCount-groupSize)==1) {
+	return false;
+	}
+	
+	
+	if(contains(group,THIEF)) 
+	{
+		if(not contains(group,POLICE)) 
+		{
+			return true;
+		}
+	}
+	return false;
+
+}
+
+
+bool verifyModel(){
+
+	//verify bank a
+	if(momProblem(bankA) || dadProblem(bankA) || thiefProblem(bankA) ) {
+		return false; 
+	}
+
+
+	//verify bank b
+	if(momProblem(bankB) || dadProblem(bankB) || thiefProblem(bankB) ) {
+		return false; 
+	}
+
+	//verify boat
+	if(momProblem(boatGroup) || dadProblem(boatGroup) || thiefProblem(boatGroup) ) {
+		return false; 
+	}
+
+	return true;
+
+}</declaration><template><name x="5" y="5">Thief</name><parameter>boat_t &amp;boat</parameter><declaration>// Place local declarations here.
         </declaration><location id="id0" x="216" y="-64"><name x="264" y="-80">Bank_B</name></location><location id="id1" x="-416" y="-64"><name x="-512" y="-80">Bank_A</name></location><location id="id2" x="72" y="-64"><name x="-8" y="-80">Board_B</name></location><location id="id3" x="-264" y="-64"><name x="-240" y="-80">Board_A</name></location><init ref="id1"/><transition><source ref="id2"/><target ref="id3"/><label kind="guard" x="-136" y="-8">boat.canSailBA</label><label kind="synchronisation" x="-136" y="-24">boatSail?</label><nail x="24" y="16"/><nail x="-224" y="16"/></transition><transition><source ref="id3"/><target ref="id2"/><label kind="guard" x="-136" y="-160">boat.canSailAB</label><label kind="synchronisation" x="-136" y="-176">boatSail?</label><nail x="-224" y="-136"/><nail x="24" y="-136"/></transition><transition><source ref="id0"/><target ref="id2"/><label kind="assignment" x="104" y="-24">boat.capacity--</label><nail x="176" y="-32"/><nail x="112" y="-32"/></transition><transition><source ref="id2"/><target ref="id0"/><label kind="assignment" x="104" y="-120">boat.capacity++</label><nail x="112" y="-96"/><nail x="176" y="-96"/></transition><transition><source ref="id0"/><target ref="id0"/><nail x="256" y="-40"/><nail x="256" y="-80"/></transition><transition><source ref="id1"/><target ref="id1"/><nail x="-456" y="-40"/><nail x="-456" y="-88"/></transition><transition><source ref="id3"/><target ref="id1"/><label kind="assignment" x="-384" y="-24">boat.capacity--</label><nail x="-304" y="-32"/><nail x="-384" y="-32"/></transition><transition><source ref="id1"/><target ref="id3"/><label kind="assignment" x="-384" y="-120">boat.capacity++</label><nail x="-384" y="-96"/><nail x="-304" y="-96"/></transition></template><template><name x="5" y="5">Policeman</name><parameter>boat_t &amp;boat</parameter><declaration>// Place local declarations here.
         </declaration><location id="id4" x="216" y="-64"><name x="264" y="-80">Bank_B</name></location><location id="id5" x="-416" y="-64"><name x="-512" y="-80">Bank_A</name></location><location id="id6" x="72" y="-64"><name x="-8" y="-80">Board_B</name></location><location id="id7" x="-264" y="-64"><name x="-240" y="-80">Board_A</name></location><init ref="id5"/><transition><source ref="id6"/><target ref="id7"/><label kind="guard" x="-136" y="-8">boat.canSailBA</label><label kind="synchronisation" x="-136" y="-24">boatSail?</label><nail x="24" y="16"/><nail x="-224" y="16"/></transition><transition><source ref="id7"/><target ref="id6"/><label kind="guard" x="-136" y="-160">boat.canSailAB</label><label kind="synchronisation" x="-136" y="-176">boatSail?</label><nail x="-224" y="-136"/><nail x="24" y="-136"/></transition><transition><source ref="id4"/><target ref="id6"/><label kind="assignment" x="104" y="-24">boat.capacity--</label><nail x="176" y="-32"/><nail x="112" y="-32"/></transition><transition><source ref="id6"/><target ref="id4"/><label kind="assignment" x="104" y="-112">boat.capacity++</label><nail x="112" y="-88"/><nail x="176" y="-88"/></transition><transition><source ref="id4"/><target ref="id4"/><nail x="256" y="-40"/><nail x="256" y="-80"/></transition><transition><source ref="id5"/><target ref="id5"/><nail x="-456" y="-40"/><nail x="-456" y="-88"/></transition><transition><source ref="id7"/><target ref="id5"/><label kind="assignment" x="-384" y="-32">boat.capacity++</label><nail x="-304" y="-40"/><nail x="-384" y="-40"/></transition><transition><source ref="id5"/><target ref="id7"/><label kind="assignment" x="-384" y="-120">boat.capacity--</label><nail x="-384" y="-88"/><nail x="-304" y="-88"/></transition></template><template><name>Boat</name><parameter>boat_t &amp;boat</parameter><location id="id8" x="-264" y="16"><name x="-304" y="48">Unloading_A</name></location><location id="id9" x="-8" y="16"><name x="24" y="32">Loading_B</name></location><location id="id10" x="-8" y="-200"><name x="-24" y="-240">Unloading_B</name></location><location id="id11" x="-264" y="-200"><name x="-360" y="-240">Loading_A</name></location><init ref="id8"/><transition><source ref="id9"/><target ref="id9"/><nail x="-8" y="56"/><nail x="40" y="16"/></transition><transition><source ref="id11"/><target ref="id11"/><nail x="-312" y="-200"/><nail x="-264" y="-240"/></transition><transition><source ref="id9"/><target ref="id8"/><label kind="guard" x="-192" y="-8">boat.capacity &lt; 2</label><label kind="synchronisation" x="-168" y="-24">boatSail!</label><label kind="assignment" x="-200" y="16">boat.canSailBA = false</label></transition><transition><source ref="id11"/><target ref="id10"/><label kind="guard" x="-200" y="-224">boat.capacity &lt; 2</label><label kind="synchronisation" x="-176" y="-248">boatSail!</label><label kind="assignment" x="-208" y="-192">boat.canSailAB = false</label></transition><transition><source ref="id8"/><target ref="id11"/><label kind="assignment" x="-424" y="-96">boat.canSailAB = true,
 boat.capacity = 0</label></transition><transition><source ref="id10"/><target ref="id9"/><label kind="assignment" x="0" y="-104">boat.canSailBA = true,
