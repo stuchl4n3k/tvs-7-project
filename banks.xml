@@ -193,13 +193,14 @@ bool dadProblem(int group[PERSON_COUNT]) {
 //The thief cannot be with a family member unless a policeman is present
 bool thiefProblem(int group[PERSON_COUNT]) {
 	int groupSize = count(group);
-
+	bool hasThief = contains(group,THIEF);
+	
 	// Thief is alone.
-	if ((PERSON_COUNT-groupSize)==1) {
+	if (hasThief &amp;&amp; (groupSize)==1) {
 		return false;
 	}
 	
-	if (contains(group,THIEF)) {
+	if (hasThief) {
 		if (not contains(group,POLICE)) {
 			return true;
 		}

@@ -38,4 +38,14 @@ E<> (contains(bankA,THIEF) and contains(bankB,POLICE) and contains(bankA,DAD))
 /*
 
 */
+E<>  contains(bankA,MOM) and contains(bankA,BOY) and (contains(bankB,DAD))
+
+/*
+
+*/
+E<>  contains(bankA,MOM) and contains(bankA,BOY) and (contains(bankB,DAD))
+
+/*
+
+*/
 E<>  contains(bankA,MOM) and contains(bankA,BOY) and (not contains(bankA,DAD))
