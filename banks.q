@@ -3,7 +3,7 @@
 /*
 
 */
- E<>  contains(bankA,DAD) and contains(bankA,GIRL) and (contains(bankA,MOM)) 
+ E<>  contains(bankB,DAD) and contains(bankB,GIRL) and (contains(bankB,MOM)) 
 
 /*
 
@@ -23,7 +23,7 @@ A[] not deadlock
 /*
 
 */
-E<> thiefSystem.Bank_A and  (policemanSystem.Bank_A or policemanSystem.Board_A) and momSystem.Bank_A
+E<> (thiefSystem.Bank_B && policemanSystem.Bank_B && dadSystem.Bank_B  && boy1System.Bank_B && boy2System.Bank_B && momSystem.Bank_B && girl1System.Bank_B && girl2System.Bank_B)
 
 /*
 
