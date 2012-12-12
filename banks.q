@@ -3,6 +3,21 @@
 /*
 
 */
+ E<>  contains(bankA,DAD) and contains(bankA,GIRL) and (contains(bankA,MOM)) 
+
+/*
+
+*/
+E<> momSystem.BankA
+
+/*
+
+*/
+E<>  contains(bankA,MOM) and contains(bankA,BOY) and (contains(bankB,DAD))
+
+/*
+
+*/
 A[] not deadlock
 
 /*
