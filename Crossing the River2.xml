@@ -22,7 +22,6 @@ const personType empty[NUMBER_OF_PERSONS] ={NOT_A_PERSON,NOT_A_PERSON,NOT_A_PERS
 
 int temp_sailtime = 0;
 
-chan dad
 
 personType left[NUMBER_OF_PERSONS] = {BOY,BOY,DAD,GIRL,GIRL,MOM,THIEF,POLICE};
 personType right[NUMBER_OF_PERSONS] = empty;
