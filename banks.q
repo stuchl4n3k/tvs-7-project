@@ -8,7 +8,7 @@ A[] not deadlock
 /*
 
 */
-E<> thiefSystem.Bank_A %% policemanSystem.Bank_B
+E<> thiefSystem.Bank_A and  (policemanSystem.Bank_A or policemanSystem.Board_A) and momSystem.Bank_A
 
 /*
 
@@ -23,4 +23,19 @@ E<> boatSystem.ERROR_STATE
 /*
 
 */
-E<> boatSystem.GAME_WON 
+E<> momProblem(bankA) or momProblem(bankB) or momProblem(boatGroup)
+
+/*
+
+*/
+E<> policemanSystem.Bank_A and policemanSystem.Bank_B
+
+/*
+
+*/
+E<> (contains(bankA,THIEF) and contains(bankB,POLICE) and contains(bankA,DAD))
+
+/*
+
+*/
+E<>  contains(bankA,MOM) and contains(bankA,BOY) and (not contains(bankA,DAD))

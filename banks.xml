@@ -7,7 +7,7 @@ typedef struct {
 	bool atBankA;
 	bool atBankB;
 } boat_t;
-broadcast chan boatSail;
+urgent broadcast chan boatSail;
 broadcast chan boatSailFromSBA;
 broadcast chan boatSailToSBA;
 broadcast chan boatSailFromSAB;
@@ -25,64 +25,29 @@ const int THIEF = 5;
 const int POLICE = 6;
 const int EMPTY = 0;
 
+const int TRANSIT_CEILING = 20; //make this larger than max transit time of a person
+const int MOM_TRANSIT = 8;
+const int DAD_TRANSIT = 10;
+const int POLICE_TRANSIT = 5;
 
-const int PERSON_COUNT = 5;
-//const int PERSON_COUNT = 8;
+
+
+//const int PERSON_COUNT = 5;
+const int PERSON_COUNT = 8;
 const int BOAT_CAPACITY = 2;
 
 
-int bankA[PERSON_COUNT] = {THIEF,POLICE,BOY,BOY,DAD};
-int bankB[PERSON_COUNT] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY};
-int boatGroup[PERSON_COUNT] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY};
+//int bankA[PERSON_COUNT] = {THIEF,POLICE,BOY,BOY,DAD};
+//int bankB[PERSON_COUNT] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY};
+//int boatGroup[PERSON_COUNT] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY};
 
-//int bankA[PERSON_COUNT] = {THIEF,POLICE,BOY,BOY,DAD,MOM,GIRL,GIRL};
-//int bankB[PERSON_COUNT] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,MOM,GIRL,GIRL};
-//int boatGroup[PERSON_COUNT] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,MOM,GIRL,GIRL};
+int bankA[PERSON_COUNT] = {THIEF,POLICE,BOY,BOY,DAD,MOM,GIRL,GIRL};
+int bankB[PERSON_COUNT] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY};
+int boatGroup[PERSON_COUNT] = {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY};
 
 
-int calculateSailTime() {
-	int t = 0;
-	int i;
-	for (i=0;i&lt;PERSON_COUNT; i++) {
-		if(not boatGroup[i]==EMPTY) {
-			t=t+boatGroup[i];
-		}
-	}
-	return t;
-}
-void addPerson(int &amp;group[PERSON_COUNT], int personID) {
-	int i;
-	for (i = 0; i &lt; PERSON_COUNT; i++) {
- 		if (group[i] == EMPTY) {
-			group[i] = personID;
-			return;
-		}
-	}
- 	return;
-}
 
-void removePerson(int &amp;group[PERSON_COUNT], int personID) {
-	int i;
- 	for (i = 0; i &lt; PERSON_COUNT; i++) {
-  		if (group[i] == personID) {
-   			group[i] = EMPTY;
-			return;
-     		}
- 	}
- 	return;
-}
-
-int count(int group[PERSON_COUNT]) {
-	int i = 0;
-	int groupSize = 0;
-	for (i = 0 ; i &lt; PERSON_COUNT ; i++) {
-		if(group[i] != EMPTY) {
-			groupSize++;	
-		}		
-	}
-	return groupSize;
-}
-
+//checks if the group contains a person of the specified type
 bool contains(int group[PERSON_COUNT], int personType) {
 	int i;
 	for(i = 0 ; i &lt; PERSON_COUNT ; i++) {
@@ -94,6 +59,67 @@ bool contains(int group[PERSON_COUNT], int personType) {
 	return false;
 }
 
+
+//Calculates the sail time of the boat for a the specific occupants
+//We assume that the most skilled person sails.
+int calculateSailTime() {
+	int min = TRANSIT_CEILING;
+	if(contains(boatGroup,POLICE)){
+		if(min&gt;POLICE_TRANSIT) {
+			min = POLICE_TRANSIT;
+		}
+	}
+	if(contains(boatGroup,MOM)){
+		if(min&gt;MOM_TRANSIT) {
+			min = MOM_TRANSIT;
+		}
+	}
+	if(contains(boatGroup,DAD)){
+		if(min&gt;DAD_TRANSIT) {
+			min = DAD_TRANSIT;
+		}
+	}
+	return min;
+}
+
+//adds a person to a group
+void addPerson(int &amp;group[PERSON_COUNT], int personID) {
+	int i;
+	for (i = 0; i &lt; PERSON_COUNT; i++) {
+ 		if (group[i] == EMPTY) {
+			group[i] = personID;
+			return;
+		}
+	}
+ 	return;
+}
+//removes a person from a group
+void removePerson(int &amp;group[PERSON_COUNT], int personID) {
+	int i;
+ 	for (i = 0; i &lt; PERSON_COUNT; i++) {
+  		if (group[i] == personID) {
+   			group[i] = EMPTY;
+			return;
+     		}
+ 	}
+ 	return;
+}
+//returns the number of persons in the group
+int count(int group[PERSON_COUNT]) {
+	int i = 0;
+	int groupSize = 0;
+	for (i = 0 ; i &lt; PERSON_COUNT ; i++) {
+		if(group[i] != EMPTY) {
+			groupSize++;	
+		}		
+	}
+	return groupSize;
+}
+
+//Checks boat constraints
+//A boat can set sail only if it has at least one of the followind: Mom, Dad, Policeman
+//A boat can set sail only if it has at most `BOAT_CAPACITY` people on board.
+//
 bool boatProblem() {
 	bool empty = count(boatGroup) &lt;= 0;
 	bool overloaded = count(boatGroup) &gt; BOAT_CAPACITY;
@@ -106,36 +132,44 @@ bool boatProblem() {
 	return false;
 }
 
+
+//Checks moms constraints
+//Mom cannot be alone with the boys
 bool momProblem(int group[PERSON_COUNT]) {
+	
 	bool containsMom = contains(group, MOM);
 	bool containsBoys = contains(group,BOY);
-	if(containsMom &amp;&amp; containsBoys) {
-		int i = 0;
-		for(i=0;i&lt;PERSON_COUNT;i++) {
-			if(group[i]!=MOM &amp;&amp; group[i]!=BOY) {
-				return false; 
-			}
-		}
-		return true; //nobody other than a boy and a mum found...constraint violated
+	bool containsDad = contains(group,DAD);
+	if(containsMom and containsBoys and (not containsDad)) {
+		return true;
 	}
+	
 	return false;
 }
-
+//Checks children constraints
+//Kids cannot be alone without an adult.
 bool kidProblem(int group[PERSON_COUNT]) {
+	return false;//relaxed
+	/*bool containsMom = contains(group, MOM);
+	bool containsBoys = contains(group,BOY);
+	bool containsDad = contains(group,DAD);
+	bool containsPolice = contains(group,POLICE);
+	if(
 	int i = 0;
 	for(i=0;i&lt;PERSON_COUNT;i++) {
 	 if(not (group[i]==BOY || group[i]==GIRL)) {
 		 return false; // found a non kid in the group
 		}
 	}
-	return true;
+	return true;*/
 
 
 	
 
 }
 
-
+//Checks dad constraints
+//Dad cannot be alone with the girls.
 bool dadProblem(int group[PERSON_COUNT]) {
 	bool containsDad = contains(group, DAD);
 	bool containsGirl = contains(group, GIRL);
@@ -155,7 +189,8 @@ bool dadProblem(int group[PERSON_COUNT]) {
 	}
 }
 
-
+//Checks thief constraints
+//The thief cannot be with a family member unless a policeman is present
 bool thiefProblem(int group[PERSON_COUNT]) {
 	int groupSize = count(group);
 
@@ -171,7 +206,7 @@ bool thiefProblem(int group[PERSON_COUNT]) {
 	}
 	return false;
 }
-
+//Checks if the game has been won - all people are on bank B.
 bool gameWon() {
 	if(count(bankB)==PERSON_COUNT) {
 		return true;
@@ -181,15 +216,8 @@ bool gameWon() {
 }
 
 bool groupHasProblem(int group[PERSON_COUNT]) {
-	if (
-		momProblem(group) ||
-		dadProblem(group) ||
-		thiefProblem(group) ||
-		kidProblem(group)
-	) {
-		return true; 
-	}
-	return false;
+	return  momProblem(group) ||	dadProblem(group) ||	thiefProblem(group) ||	kidProblem(group);
+	
 	}
 
 //checks if the model will be valid if I embark DOESNT WORK - TRASH
@@ -210,7 +238,7 @@ bool canEmbark(int personID, int fromGroup[PERSON_COUNT],int toGroup[PERSON_COUN
 
 }
 
-
+//Checks if we havent gained/lost a person
 bool headcountProblem() {
 	int headcount = count(bankA) + count(bankB) + count(boatGroup);
 	if(headcount!= PERSON_COUNT) {
@@ -219,9 +247,9 @@ bool headcountProblem() {
 	return false;
 }
 
-
+//Checks if all the constraints have been fulfilled
 bool verifyModel() {
-
+	if(contains(bankA,THIEF) and contains(bankB,POLICE) and contains(bankA,DAD)) return false;
 
 	
 	//verify bank a
@@ -243,7 +271,7 @@ bool verifyModel() {
 }</declaration><template><name>Boat</name><parameter>boat_t &amp;boat</parameter><location id="id0" x="-128" y="16"><name x="-168" y="-24">Sailing_B_A</name><label kind="invariant" x="-168" y="32">x&lt;=calculateSailTime()</label></location><location id="id1" x="-128" y="-336"><name x="-168" y="-376">Sailing_A_B</name><label kind="invariant" x="-160" y="-320">x&lt;=calculateSailTime()</label></location><location id="id2" x="-136" y="-448" color="#ff0000"><name x="-256" y="-480">ERROR_STATE</name><urgent/></location><location id="id3" x="216" y="152" color="#00ff00"><name x="264" y="144">GAME_WON</name><urgent/></location><location id="id4" x="-528" y="16"><name x="-568" y="48">Unloading_A</name></location><location id="id5" x="320" y="16"><name x="336" y="-8">Loading_B</name></location><location id="id6" x="320" y="-336"><name x="328" y="-360">Unloading_B</name></location><location id="id7" x="-520" y="-336"><name x="-616" y="-376">Loading_A</name></location><init ref="id4"/><transition><source ref="id0"/><target ref="id4"/><label kind="guard" x="-384" y="-24">x==calculateSailTime()</label><label kind="synchronisation" x="-384" y="-8">boatSailFromSBA!</label></transition><transition><source ref="id1"/><target ref="id6"/><label kind="guard" x="128" y="-312">x==calculateSailTime()</label><label kind="synchronisation" x="88" y="-328">boatSailFromSAB!</label></transition><transition><source ref="id2"/><target ref="id2"/><nail x="-32" y="-488"/><nail x="-152" y="-536"/></transition><transition><source ref="id4"/><target ref="id2"/><label kind="guard" x="-800" y="-240">headcountProblem()</label><nail x="-656" y="16"/><nail x="-648" y="-448"/></transition><transition><source ref="id5"/><target ref="id2"/><label kind="guard" x="656" y="-256">headcountProblem()</label><nail x="648" y="16"/><nail x="648" y="-280"/><nail x="648" y="-448"/></transition><transition><source ref="id6"/><target ref="id2"/><label kind="guard" x="-16" y="-392">headcountProblem()</label><nail x="72" y="-400"/></transition><transition><source ref="id7"/><target ref="id2"/><label kind="guard" x="-432" y="-416">headcountProblem()</label><nail x="-328" y="-392"/></transition><transition><source ref="id3"/><target ref="id3"/><nail x="256" y="112"/><nail x="256" y="192"/></transition><transition><source ref="id5"/><target ref="id3"/><label kind="guard" x="120" y="72">(gameWon())</label><nail x="128" y="152"/></transition><transition><source ref="id5"/><target ref="id5"/><nail x="360" y="48"/><nail x="312" y="48"/></transition><transition><source ref="id7"/><target ref="id7"/><nail x="-568" y="-336"/><nail x="-520" y="-376"/></transition><transition><source ref="id5"/><target ref="id0"/><label kind="guard" x="-16" y="-56">(not gameWon() &amp;&amp; verifyModel())</label><label kind="synchronisation" x="56" y="-80">boatSailToSBA!</label><label kind="assignment" x="24" y="-32">boat.atBankB = false,
 x=0</label></transition><transition><source ref="id7"/><target ref="id1"/><label kind="guard" x="-368" y="-304">(verifyModel())</label><label kind="synchronisation" x="-368" y="-320">boatSailToSAB!</label><label kind="assignment" x="-368" y="-288">boat.atBankA = false,
 x=0</label></transition><transition><source ref="id4"/><target ref="id7"/><label kind="assignment" x="-512" y="-184">boat.atBankA = true</label></transition><transition><source ref="id6"/><target ref="id5"/><label kind="assignment" x="328" y="-192">boat.atBankB = true</label></transition></template><template><name x="5" y="5">Person</name><parameter>boat_t &amp;boat, const int ID</parameter><declaration>// Place local declarations here.
-        </declaration><location id="id8" x="-96" y="56"><name x="-128" y="80">sailing_B_A</name></location><location id="id9" x="-96" y="-184"><name x="-128" y="-224">sailing_A_B</name></location><location id="id10" x="216" y="-64"><name x="264" y="-80">Bank_B</name></location><location id="id11" x="-416" y="-64"><name x="-512" y="-80">Bank_A</name></location><location id="id12" x="72" y="-64"><name x="-8" y="-80">Board_B</name></location><location id="id13" x="-264" y="-64"><name x="-240" y="-80">Board_A</name></location><init ref="id11"/><transition><source ref="id8"/><target ref="id8"/><nail x="-120" y="24"/><nail x="-80" y="24"/><nail x="-72" y="24"/></transition><transition><source ref="id9"/><target ref="id9"/><nail x="-120" y="-152"/><nail x="-72" y="-152"/></transition><transition><source ref="id9"/><target ref="id12"/><label kind="synchronisation" x="-80" y="-128">boatSailFromSAB?</label><nail x="8" y="-184"/></transition><transition><source ref="id8"/><target ref="id13"/><label kind="synchronisation" x="-208" y="0">boatSailFromSBA?</label><nail x="-184" y="56"/></transition><transition><source ref="id12"/><target ref="id8"/><label kind="synchronisation" x="-72" y="-24">boatSailToSBA?</label><nail x="40" y="-16"/><nail x="16" y="24"/><nail x="-8" y="56"/></transition><transition><source ref="id13"/><target ref="id9"/><label kind="synchronisation" x="-232" y="-152">boatSailToSAB?</label><nail x="-240" y="-144"/><nail x="-208" y="-184"/></transition><transition><source ref="id10"/><target ref="id12"/><label kind="guard" x="104" y="16">(boat.atBankB)</label><label kind="assignment" x="80" y="-24">removePerson(bankB, ID),
+        </declaration><location id="id8" x="-96" y="56"><name x="-128" y="80">sailing_B_A</name></location><location id="id9" x="-96" y="-184"><name x="-128" y="-224">sailing_A_B</name></location><location id="id10" x="216" y="-64"><name x="264" y="-80">Bank_B</name></location><location id="id11" x="-416" y="-64"><name x="-512" y="-80">Bank_A</name></location><location id="id12" x="72" y="-64"><name x="-8" y="-80">Board_B</name></location><location id="id13" x="-264" y="-64"><name x="-240" y="-80">Board_A</name></location><init ref="id11"/><transition><source ref="id9"/><target ref="id12"/><label kind="synchronisation" x="-32" y="-208">boatSailFromSAB?</label><nail x="8" y="-184"/></transition><transition><source ref="id8"/><target ref="id13"/><label kind="synchronisation" x="-208" y="0">boatSailFromSBA?</label><nail x="-184" y="56"/></transition><transition><source ref="id12"/><target ref="id8"/><label kind="synchronisation" x="-72" y="-24">boatSailToSBA?</label><nail x="40" y="-16"/><nail x="16" y="24"/><nail x="-8" y="56"/></transition><transition><source ref="id13"/><target ref="id9"/><label kind="synchronisation" x="-232" y="-152">boatSailToSAB?</label><nail x="-240" y="-144"/><nail x="-208" y="-184"/></transition><transition><source ref="id10"/><target ref="id12"/><label kind="guard" x="104" y="16">(boat.atBankB)</label><label kind="assignment" x="80" y="-24">removePerson(bankB, ID),
 addPerson(boatGroup, ID)</label><nail x="176" y="-32"/><nail x="112" y="-32"/></transition><transition><source ref="id12"/><target ref="id10"/><label kind="guard" x="104" y="-128">(boat.atBankB)</label><label kind="assignment" x="72" y="-168">removePerson(boatGroup, ID),
 addPerson(bankB, ID)</label><nail x="112" y="-96"/><nail x="176" y="-96"/></transition><transition><source ref="id10"/><target ref="id10"/><nail x="256" y="-40"/><nail x="256" y="-80"/></transition><transition><source ref="id11"/><target ref="id11"/><nail x="-456" y="-40"/><nail x="-456" y="-88"/></transition><transition><source ref="id13"/><target ref="id11"/><label kind="guard" x="-400" y="-120">(boat.atBankA)</label><label kind="assignment" x="-424" y="-24">removePerson(boatGroup, ID),
 addPerson(bankA, ID)</label><nail x="-304" y="-32"/><nail x="-384" y="-32"/></transition><transition><source ref="id11"/><target ref="id13"/><label kind="guard" x="-384" y="24">(boat.atBankA)</label><label kind="assignment" x="-424" y="-160">removePerson(bankA, ID),
@@ -255,9 +283,8 @@ dadSystem = Person(boat, DAD);
 boatSystem = Boat(boat);
 boy1System = Person(boat, BOY);
 boy2System = Person(boat, BOY);
-//momSystem = Person(boat,MOM);
-//girl1System = Person(boat,GIRL);
-//girl2System = Person(boat,GIRL);
+momSystem = Person(boat,MOM);
+girl1System = Person(boat,GIRL);
+girl2System = Person(boat,GIRL);
 
-system boatSystem, thiefSystem, policemanSystem,dadSystem,boy1System,boy2System;
-//momSystem,girl1System,girl2System ;</system></nta>
+system boatSystem, thiefSystem, policemanSystem,dadSystem,boy1System,boy2System,momSystem,girl1System,girl2System ;</system></nta>
