@@ -23,7 +23,7 @@ A[] not deadlock
 /*
 
 */
-E<> thiefSystem.Bank_A and  (policemanSystem.Bank_A or policemanSystem.Board_A) and momSystem.Bank_A
+E<>boatSystem.Sailing_A_B --> 
 
 /*
 
@@ -38,34 +38,34 @@ E<> boatSystem.GAME_WON
 /*
 
 */
-E<> boatSystem.ERROR_STATE
+E<> true == false
 
 /*
 
 */
-E<> momProblem(bankA) or momProblem(bankB) or momProblem(boatGroup)
+boatSystem.Sailing_A_B --> thiefSystem.Bank_A && policemanSystem.Bank_B && momSystem.Bank_A
 
 /*
 
 */
-E<> policemanSystem.Bank_A and policemanSystem.Bank_B
+boatSystem.Sailing_A_B --> policemanSystem.Bank_A and policemanSystem.Bank_B
 
 /*
 
 */
- E<> boatSystem.Sailing_A_B && count(boatGroup)>2
+boatSystem.Sailing_A_B --> count(boatGroup)>2
 
 /*
 
 */
-E<> thiefProblem(bankA) and boatSystem.Sailing_A_B
+boatSystem.Sailing_A_B -->  thiefProblem(bankA)
 
 /*
 
 */
-E<> (contains(bankA,THIEF) and contains(bankB,POLICE) and contains(bankA,DAD))
+boatSystem.Sailing_A_B -->  (contains(bankA,THIEF) and contains(bankB,POLICE) and contains(bankA,DAD))
 
 /*
 
 */
-E<>  contains(bankA,MOM) and contains(bankA,BOY) and contains(bankB,DAD)
+E[] contains(bankA,MOM) and contains(bankA,BOY) and contains(bankB,DAD)
